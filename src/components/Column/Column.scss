@@ -1,4 +1,4 @@
-@import "../../_setting.scss";
+@import '../../_setting.scss';
 
 $list-bg-color: #ebecf0;
 
@@ -37,9 +37,7 @@ $column-border-radius: 5px;
   ul.card-list {
     list-style: none;
     margin: 0;
-    max-height: calc(
-      100% - #{$column-header-height} - #{$column-footer-height}
-    );
+    max-height: calc(100% - #{$column-header-height} - #{$column-footer-height});
     overflow-y: auto;
     &::-webkit-scrollbar {
       -webkit-appearance: none;

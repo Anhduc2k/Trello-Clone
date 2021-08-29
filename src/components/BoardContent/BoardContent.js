@@ -1,25 +1,23 @@
-import React, { useEffect, useState } from "react";
-import { isEmpty } from "lodash";
-import "./BoardContent.scss";
-import Column from "../Column/Column";
-import { mapOrder } from "../../ultilities/sorts";
-import { initialData } from "../../actions/initialData";
+import React, { useEffect, useState } from 'react'
+import { isEmpty } from 'lodash'
+import './BoardContent.scss'
+import Column from '../Column/Column'
+import { mapOrder } from '../../ultilities/sorts'
+import { initialData } from '../../actions/initialData'
 
 export default function BoardContent() {
-  const [board, setBoard] = useState({});
-  const [columns, setColumns] = useState([]);
+  const [board, setBoard] = useState({})
+  const [columns, setColumns] = useState([])
   useEffect(() => {
-    const boardFromDB = initialData.boards.find(
-      (board) => board.id === "board-1"
-    );
+    const boardFromDB = initialData.boards.find(board => board.id === 'board-1')
     if (boardFromDB) {
-      setBoard(boardFromDB);
+      setBoard(boardFromDB)
 
-      setColumns(mapOrder(boardFromDB.columns, boardFromDB.columOrder, "id"));
+      setColumns(mapOrder(boardFromDB.columns, boardFromDB.columOrder, 'id'))
     }
-  }, []);
+  }, [])
   if (isEmpty(board)) {
-    return <div className="not-found">Board not Found</div>;
+    return <div className="not-found">Board not Found</div>
   }
   return (
     <div className="board-content">
@@ -27,5 +25,5 @@ export default function BoardContent() {
         <Column key={index} column={column} />
       ))}
     </div>
-  );
+  )
 }
