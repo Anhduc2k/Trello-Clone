@@ -1,15 +1,71 @@
-import React from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
+import { Dropdown, Form } from 'react-bootstrap'
 import { Container, Draggable } from 'react-smooth-dnd'
+import { MODAL_ACTION_CONFIRM } from '../../ultilities/constants'
+import { saveContentAfterPressEnter, selectAllInLineText } from '../../ultilities/contentEditable'
 import { mapOrder } from '../../ultilities/sorts'
 import Card from '../Card/Card'
+import ConfirmModal from '../Commom/ConfirmModal'
 import './Column.scss'
 export default function Column(props) {
-  const { column, onCardDrop } = props
+  const { column, onCardDrop, onUpdateColumn } = props
   const cards = mapOrder(column.cards, column.cardOrder, 'id')
+  const [showConfirmModal, setShowConfirmModal] = useState(false)
+  const [columnTitle, setColumnTitle] = useState('')
+  const handleColumnTitleChange = useCallback(e => setColumnTitle(e.target.value), [])
+
+  useEffect(() => {
+    setColumnTitle(column.title)
+  }, [column.title])
+
+  const toggleShowConfirmModal = () => setShowConfirmModal(!showConfirmModal)
+  const onConfirmModalAction = type => {
+    if (type === MODAL_ACTION_CONFIRM) {
+      const newColumn = {
+        ...column,
+        _destroy: true
+      }
+      onUpdateColumn(newColumn)
+    }
+    toggleShowConfirmModal()
+  }
+  const handleColumnTitleBlur = () => {
+    const newColumn = {
+      ...column,
+      title: columnTitle
+    }
+    onUpdateColumn(newColumn)
+  }
 
   return (
     <div className="column">
-      <header className="column-drag-handle">{column.title}</header>
+      <header className="column-drag-handle">
+        <div className="column-title">
+          <Form.Control
+            size="sm"
+            type="text"
+            className="trello-content-editable"
+            value={columnTitle}
+            onChange={handleColumnTitleChange}
+            onBlur={handleColumnTitleBlur}
+            onKeyDown={saveContentAfterPressEnter}
+            onClick={selectAllInLineText}
+            onMouseDown={e => e.preventDefault()}
+            spellCheck="false"
+          />
+        </div>
+        <div className="column-dropdown-actions">
+          <Dropdown>
+            <Dropdown.Toggle id="dropdown-basic" size="sm" className="dropdown-btn" />
+
+            <Dropdown.Menu>
+              <Dropdown.Item>Add card...</Dropdown.Item>
+              <Dropdown.Item onClick={toggleShowConfirmModal}>Remove column ...</Dropdown.Item>
+              <Dropdown.Item>Move all card in this column... </Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
+        </div>
+      </header>
       <div className="card-list">
         <Container
           groupName="col"
@@ -37,6 +93,12 @@ export default function Column(props) {
           Add another card
         </div>
       </footer>
+      <ConfirmModal
+        show={showConfirmModal}
+        onAction={onConfirmModalAction}
+        title="Remove column"
+        content={`Are you sure you want to remove <strong>${column.title}</strong>. <br /> All cards will also be removed`}
+      />
     </div>
   )
 }
